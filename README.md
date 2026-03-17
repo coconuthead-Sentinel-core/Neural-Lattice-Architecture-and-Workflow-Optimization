@@ -1,88 +1,150 @@
-# Neural-Lattice-Architecture-and-Workflow-Optimization
-A structured workflow framework that explains the Neural Lattice Architecture and its role in optimizing AI‑supported project management.
-# Neural Lattice Architecture: Strategic Insights on Workflow Optimization
+# Neural Lattice Cognitive Architecture (NLCA)
 
-This repository documents a conceptual framework and research article on workflow optimization. It is not a product, service, or clinical model.
-
-This repository contains the full technical article on the Neural Lattice Architecture (NLA) and its application to workflow optimization, particularly for professionals with diverse working styles. It expands [...]
-
----
+A cognitive workflow framework providing persistent memory, zone-based organization (GREEN/YELLOW/RED), and neurodivergent-optimized workflows for AI-human collaboration.
 
 ## Overview
 
-The Neural Lattice Architecture is a cognitive workflow framework designed to improve AI–human collaboration by embedding project intelligence directly into a structured folder system. This redu[...]
+The Neural Lattice Cognitive Architecture addresses three critical limitations in AI interactions:
 
-The system organizes work into three cognitive zones:
+1. **Zero persistent memory** — complete context loss between sessions
+2. **No structured organization** — generated content has no metadata or lifecycle
+3. **No cognitive load awareness** — information overload for neurodivergent users
 
-- **GREEN Zone** – Active work with the highest cognitive load  
-- **YELLOW Zone** – Synthesis, pattern recognition, and moderate cognitive demands  
-- **RED Zone** – Reference materials and completed work requiring minimal cognitive effort  
+NLCA provides: file-based persistent memory, a three-zone organization system mapped to cognitive load, automated metadata generation, session management with Pomodoro timing, and a REST API for all operations.
 
----
+## Three-Zone System
 
-## Learning and Execution Cycle
+| Zone | Cognitive Load | Purpose |
+|------|---------------|---------|
+| **GREEN** | 7-10 (High) | Active development, frequent access |
+| **YELLOW** | 4-6 (Medium) | Synthesis, pattern recognition, moderate demand |
+| **RED** | 1-3 (Low) | Reference materials, archived work |
 
-The workflow integrates multi‑modal learning techniques that support users with varied cognitive preferences and create predictable, repeatable routines:
+Zone transitions enforce guard conditions (e.g., a document can only move GREEN→YELLOW when `cognitive_load < 7 AND status != DRAFT`).
 
-1. Creative sessions with multiple AI assistants  
-2. Template structuring  
-3. First‑pass reading with highlights  
-4. Confirmation statements  
-5. Second‑pass review  
-6. Handwritten task lists  
-7. Photo capture of notes  
-8. Template regeneration via AI  
-9. File storage for persistent reference  
-10. Periodic printouts for accountability  
+## Quick Start
 
-This cycle enhances retention, reduces overwhelm, and creates a stable cognitive environment for complex projects.
+```bash
+# Clone and install
+git clone https://github.com/coconuthead-Sentinel-core/Neural-Lattice-Architecture-and-Workflow-Optimization.git
+cd Neural-Lattice-Architecture-and-Workflow-Optimization
+pip install -e ".[dev]"
 
----
+# Run the API server
+uvicorn neural_lattice.api.app:app --reload
 
-## Practical Application
+# API docs available at http://127.0.0.1:8000/docs
+```
 
-The Neural Lattice system:
+## Configuration
 
-- Streamlines individual projects  
-- Creates a feedback loop for continuous improvement  
-- Scales across multiple domains  
-- Supports users with different cognitive styles  
-- Reduces cognitive friction  
-- Enables consistent, context‑aware workflows  
+Copy `.env.example` to `.env` and adjust settings:
 
----
+```bash
+cp .env.example .env
+```
 
-## What This Demonstrates
+Key settings: `NLCA_DB_PATH`, `NLCA_API_PORT`, `NLCA_POMODORO_MIN`.
 
-- Systems thinking in organizing complex workflows
-- Workflow design principles for AI-human collaboration
-- AI-assisted process modeling techniques
+## API Endpoints
 
-## Market Potential
+### Documents
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/documents` | Create document with auto-generated metadata |
+| GET | `/api/documents` | List all documents |
+| GET | `/api/documents/{doc_id}` | Get document by ID |
+| PUT | `/api/documents/{doc_id}` | Update document |
+| DELETE | `/api/documents/{doc_id}` | Delete document |
+| GET | `/api/search` | Search by zone, status, tag, artifact_type, text |
 
-This methodology can be packaged as a workflow optimization product for:
+### Zones
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/classify` | Classify zone from cognitive load |
+| POST | `/api/migrate` | Migrate document between zones (with guard enforcement) |
+| GET | `/api/zones/summary` | Document count per zone |
+| POST | `/api/validate` | Validate metadata completeness |
 
-- Professionals with diverse working styles  
-- Teams needing predictable, teachable processes  
-- Organizations seeking to reduce cognitive load and improve operational clarity  
+### Sessions
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/sessions` | Initialize a new session |
+| POST | `/api/sessions/{id}/work` | Start a work block |
+| POST | `/api/sessions/{id}/end-work` | End work block (triggers break) |
+| POST | `/api/sessions/{id}/load` | Record cognitive load (1-10) |
+| POST | `/api/sessions/{id}/wrap-up` | Begin session wrap-up |
+| POST | `/api/sessions/{id}/close` | Close session |
 
----
+## Metadata Schema (10 Required Fields)
 
-## LinkedIn Article
+Every document receives YAML frontmatter with:
 
-A concise version of this article is available on LinkedIn:
+| Field | Type | Validation |
+|-------|------|------------|
+| `doc_id` | String | `^[A-Z]{3,4}-[A-Z]{3,6}-[0-9]{3}$` |
+| `title` | String | 1-200 characters |
+| `zone` | Enum | GREEN \| YELLOW \| RED |
+| `protocol` | String | Onset_Omega_1 \| Joy_Protocol \| Coconut_Head \| Combined |
+| `artifact_type` | Enum | charter, spec, code, test, etc. |
+| `cognitive_load` | Integer | 1-10, must align with zone |
+| `timestamp` | ISO8601 | RFC3339 compliant |
+| `dependencies` | Array | Valid doc_id references |
+| `tags` | Array | lowercase_underscore format |
+| `status` | Enum | DRAFT \| ACTIVE \| TESTING \| ARCHIVED \| REFERENCE |
 
-**LinkedIn Link:** *(Add link after publishing)*
+## Project Structure
 
----
----
+```
+neural_lattice/
+├── api/              # FastAPI REST API
+│   ├── app.py        # Application and endpoints
+│   └── models.py     # Pydantic request/response models
+├── meta/             # System layer
+│   ├── config.py     # Environment-based configuration
+│   └── schemas.py    # Metadata schema definitions and validation
+├── zone_engine.py    # Zone FSM with transition guards
+├── metadata_engine.py # Auto-generates YAML frontmatter
+├── document_store.py # SQLite-backed document CRUD
+└── session_manager.py # Pomodoro + cognitive load tracking
+docs/                 # SDLC documentation (13 documents)
+tests/                # Test suite (103 tests, 90% coverage)
+.github/workflows/    # CI/CD pipeline
+```
+
+## Testing
+
+```bash
+# Run tests
+pytest -v
+
+# Run with coverage
+pytest --cov=neural_lattice --cov-report=term-missing
+```
+
+Current: **103 tests, 90% code coverage**.
+
+## SDLC Documentation
+
+Full SDLC documentation suite in `docs/`:
+
+| Document | Status |
+|----------|--------|
+| P1-CHARTER-001: Project Charter | COMPLETE |
+| P1-BIZCASE-002: Business Case | COMPLETE |
+| P1-FEAS-003: Feasibility Study | COMPLETE |
+| P1-SOW-004: Statement of Work | COMPLETE |
+| P1-STAKE-005: Stakeholder Analysis | COMPLETE |
+| P1-RACI-006: RACI Matrix | COMPLETE |
+| P1-VISION-008: Project Vision | COMPLETE |
+| P9-CLOSE-075: Closure Report | TEMPLATE |
+| P9-ACCEPT-076: Acceptance Document | TEMPLATE |
+| P9-TRANS-077: Transition Plan | COMPLETE |
+| P9-MAINT-078: Maintenance Plan | COMPLETE |
+| P9-DRP-080: Disaster Recovery Plan | COMPLETE |
+| P9-PIR-079: Post-Implementation Review | TEMPLATE |
 
 ## License
 
-This project is shared under the Creative Commons Attribution 4.0 International License (CC BY 4.0).  
-You are free to share and adapt the material with appropriate credit.
-
-Full license text: https://creativecommons.org/licenses/by/4.0/
-
-
-## Repository Structure (Recommended)
+Creative Commons Attribution 4.0 International License (CC BY 4.0).
+https://creativecommons.org/licenses/by/4.0/
