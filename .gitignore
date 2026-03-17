@@ -12,3 +12,5 @@ htmlcov/
 *.egg
 .venv/
 venv/
+node_modules/
+dashboard/dist/
