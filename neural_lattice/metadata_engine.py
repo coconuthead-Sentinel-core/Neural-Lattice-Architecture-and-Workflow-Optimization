@@ -11,12 +11,11 @@ from typing import Any
 import yaml
 
 from neural_lattice.meta.schemas import (
-    ZoneEnum,
-    StatusEnum,
-    ProtocolEnum,
     ArtifactType,
+    ProtocolEnum,
+    StatusEnum,
+    ZoneEnum,
     validate_metadata,
-    validate_cognitive_load_for_zone,
 )
 from neural_lattice.zone_engine import ZoneEngine
 

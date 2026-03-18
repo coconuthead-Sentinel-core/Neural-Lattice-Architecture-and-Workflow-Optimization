@@ -7,7 +7,7 @@ name = "neural-lattice"
 version = "0.1.0"
 description = "Neural Lattice Cognitive Architecture — zone-based document management with cognitive load tracking"
 requires-python = ">=3.11"
-license = {text = "CC-BY-4.0"}
+license = "CC-BY-4.0"
 dependencies = [
     "fastapi>=0.110",
     "uvicorn[standard]>=0.27",
@@ -21,7 +21,12 @@ dev = [
     "pytest-cov>=4.1",
     "httpx>=0.27",
     "ruff>=0.3",
+    "pyright>=1.1",
+    "pip-audit>=2.7",
 ]
+
+[tool.setuptools.packages.find]
+include = ["neural_lattice*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,10 +1,6 @@
 """Tests for the Metadata Engine (Charter Section 3.3)."""
 
-import pytest
-import yaml
-
 from neural_lattice.metadata_engine import MetadataEngine
-from neural_lattice.meta.schemas import ArtifactType, ProtocolEnum, ZoneEnum
 
 
 class TestGenerate:
@@ -15,8 +11,16 @@ class TestGenerate:
             cognitive_load=8,
         )
         required = [
-            "doc_id", "title", "zone", "protocol", "artifact_type",
-            "cognitive_load", "timestamp", "dependencies", "tags", "status",
+            "doc_id",
+            "title",
+            "zone",
+            "protocol",
+            "artifact_type",
+            "cognitive_load",
+            "timestamp",
+            "dependencies",
+            "tags",
+            "status",
         ]
         for field in required:
             assert field in meta, f"Missing field: {field}"
@@ -34,15 +38,16 @@ class TestGenerate:
         assert meta["zone"] == "RED"
 
     def test_explicit_zone_override(self):
-        meta = MetadataEngine.generate(
-            "TST-DOC-004", "Test", cognitive_load=8, zone="GREEN"
-        )
+        meta = MetadataEngine.generate("TST-DOC-004", "Test", cognitive_load=8, zone="GREEN")
         assert meta["zone"] == "GREEN"
 
     def test_custom_tags_and_deps(self):
         meta = MetadataEngine.generate(
-            "TST-DOC-005", "Test", cognitive_load=5,
-            tags=["design", "api"], dependencies=["TST-DOC-001"],
+            "TST-DOC-005",
+            "Test",
+            cognitive_load=5,
+            tags=["design", "api"],
+            dependencies=["TST-DOC-001"],
         )
         assert meta["tags"] == ["design", "api"]
         assert meta["dependencies"] == ["TST-DOC-001"]

@@ -28,9 +28,20 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          pytest --cov=neural_lattice --cov-report=term-missing --cov-fail-under=80 -v
+          pytest --cov=neural_lattice --cov-report=term-missing --cov-fail-under=90 -v
 
       - name: Lint
         run: |
-          pip install ruff
           ruff check neural_lattice/ tests/
+
+      - name: Format check
+        run: |
+          ruff format --check neural_lattice/ tests/
+
+      - name: Type check
+        run: |
+          pyright neural_lattice/
+
+      - name: Dependency audit
+        run: |
+          pip-audit

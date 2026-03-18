@@ -11,9 +11,9 @@ from datetime import datetime, timezone
 from typing import Any
 
 from neural_lattice.meta.schemas import (
-    ZoneEnum,
-    StatusEnum,
     ZONE_LOAD_RANGES,
+    StatusEnum,
+    ZoneEnum,
 )
 
 
@@ -33,6 +33,7 @@ class TransitionResult:
 # ------------------------------------------------------------------
 # Transition guards (Charter Section 3.2)
 # ------------------------------------------------------------------
+
 
 def _guard_green_to_yellow(cognitive_load: int, status: str, **_: Any) -> str | None:
     """Guard: cognitive_load < 7 AND status != DRAFT."""
@@ -108,9 +109,7 @@ class ZoneEngine:
     ) -> TransitionResult:
         key = (from_zone, to_zone)
         if key not in TRANSITIONS:
-            raise TransitionError(
-                f"No valid transition from {from_zone.value} to {to_zone.value}"
-            )
+            raise TransitionError(f"No valid transition from {from_zone.value} to {to_zone.value}")
 
         guard_fn, new_status = TRANSITIONS[key]
         error = guard_fn(**context)

@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field, field_validator
 import re
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class DocumentCreate(BaseModel):

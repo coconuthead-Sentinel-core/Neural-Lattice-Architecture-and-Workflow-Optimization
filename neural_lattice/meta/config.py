@@ -28,7 +28,9 @@ class Settings:
     # Session defaults
     pomodoro_minutes: int = field(default_factory=lambda: int(os.getenv("NLCA_POMODORO_MIN", "25")))
     break_minutes: int = field(default_factory=lambda: int(os.getenv("NLCA_BREAK_MIN", "5")))
-    long_break_minutes: int = field(default_factory=lambda: int(os.getenv("NLCA_LONG_BREAK_MIN", "15")))
+    long_break_minutes: int = field(
+        default_factory=lambda: int(os.getenv("NLCA_LONG_BREAK_MIN", "15"))
+    )
     long_break_interval: int = 4  # every N pomodoros
 
     def zone_path(self, zone: str) -> Path:
