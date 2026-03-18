@@ -1,6 +1,10 @@
 # Neural Lattice Cognitive Architecture (NLCA)
 
-A cognitive workflow framework providing persistent memory, zone-based organization (GREEN/YELLOW/RED), and neurodivergent-optimized workflows for AI-human collaboration.
+> A structured, neurodiversity‑aligned workflow framework that explains the Neural Lattice Architecture and its role in optimizing AI‑supported project management.
+
+A cognitive workflow framework providing persistent memory, zone-based organization (GREEN/YELLOW/RED), and neurodivergent-optimized workflows for AI-human collaboration. It expands on the concepts introduced in the LinkedIn article and provides a comprehensive guide to implementing the NLA in practice.
+
+---
 
 ## Overview
 
@@ -123,6 +127,23 @@ tests/                # Test suite (103 tests, 90% coverage)
 .github/workflows/    # CI/CD pipeline
 ```
 
+## Repository Structure (Recommended Zones)
+
+```
+Neural-Lattice-Architecture-and-Workflow-Optimization/
+├── README.md                   # This document – framework overview and article
+├── LICENSE                     # CC BY 4.0 International License
+├── GREEN/                      # Active work with highest cognitive load
+│   ├── current-projects/
+│   └── in-progress-tasks/
+├── YELLOW/                     # Synthesis, pattern recognition, review
+│   ├── templates/
+│   └── drafts/
+└── RED/                        # Reference materials and completed work
+    ├── archived-projects/
+    └── reference-docs/
+```
+
 ## Testing
 
 ```bash
@@ -148,14 +169,16 @@ Full SDLC documentation suite in `docs/`:
 | P1-STAKE-005: Stakeholder Analysis | COMPLETE |
 | P1-RACI-006: RACI Matrix | COMPLETE |
 | P1-VISION-008: Project Vision | COMPLETE |
-| P9-CLOSE-075: Closure Report | TEMPLATE |
-| P9-ACCEPT-076: Acceptance Document | TEMPLATE |
+| P9-CLOSE-075: Closure Report | COMPLETE |
+| P9-ACCEPT-076: Acceptance Document | COMPLETE |
 | P9-TRANS-077: Transition Plan | COMPLETE |
 | P9-MAINT-078: Maintenance Plan | COMPLETE |
 | P9-DRP-080: Disaster Recovery Plan | COMPLETE |
-| P9-PIR-079: Post-Implementation Review | TEMPLATE |
+| P9-PIR-079: Post-Implementation Review | COMPLETE |
 
 ## License
 
-Creative Commons Attribution 4.0 International License (CC BY 4.0).
-https://creativecommons.org/licenses/by/4.0/
+This project is shared under the Creative Commons Attribution 4.0 International License (CC BY 4.0).
+You are free to share and adapt the material with appropriate credit.
+
+Full license text: https://creativecommons.org/licenses/by/4.0/
