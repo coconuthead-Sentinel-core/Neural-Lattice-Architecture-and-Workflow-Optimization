@@ -1,13 +1,11 @@
 """Tests for metadata schema validation (Charter Section 3.3)."""
 
-import pytest
-
 from neural_lattice.meta.schemas import (
-    validate_doc_id,
-    validate_tag,
-    validate_metadata,
-    validate_cognitive_load_for_zone,
     ZoneEnum,
+    validate_cognitive_load_for_zone,
+    validate_doc_id,
+    validate_metadata,
+    validate_tag,
 )
 
 

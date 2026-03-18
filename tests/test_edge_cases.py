@@ -2,30 +2,30 @@
 
 from __future__ import annotations
 
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
 
-from neural_lattice.document_store import DocumentStore
-from neural_lattice.metadata_engine import MetadataEngine
-from neural_lattice.zone_engine import ZoneEngine, TransitionError
-from neural_lattice.session_manager import SessionManager
-from neural_lattice.meta.config import Settings, get_settings
-from neural_lattice.meta.schemas import ZoneEnum, StatusEnum
 from neural_lattice.api.models import DocumentUpdate, ValidateRequest
-
+from neural_lattice.document_store import DocumentStore
+from neural_lattice.meta.config import Settings, get_settings
+from neural_lattice.meta.schemas import ZoneEnum
+from neural_lattice.metadata_engine import MetadataEngine
+from neural_lattice.session_manager import SessionManager
+from neural_lattice.zone_engine import TransitionError, ZoneEngine
 
 # ==========================================================================
 # MetadataEngine edge cases
 # ==========================================================================
 
+
 class TestMetadataEngineEdgeCases:
     def test_malformed_yaml_parsing(self, metadata_engine: MetadataEngine):
         """Non-YAML string should raise or return a non-dict result."""
         import yaml
+
         # Truly malformed YAML raises a ScannerError
         with pytest.raises(yaml.scanner.ScannerError):
             metadata_engine.from_yaml("this is not: valid: yaml: [broken")
@@ -74,6 +74,7 @@ class TestMetadataEngineEdgeCases:
 # ==========================================================================
 # DocumentStore search edge cases
 # ==========================================================================
+
 
 class TestDocumentStoreSearchEdgeCases:
     def _create_doc(self, store: DocumentStore, doc_id: str, **overrides):
@@ -129,6 +130,7 @@ class TestDocumentStoreSearchEdgeCases:
 # Config edge cases
 # ==========================================================================
 
+
 class TestConfigEdgeCases:
     def test_env_override_db_path(self, monkeypatch):
         monkeypatch.setenv("NLCA_DB_PATH", "/tmp/test_nlca.db")
@@ -174,6 +176,7 @@ class TestConfigEdgeCases:
 # ==========================================================================
 # SessionManager edge cases
 # ==========================================================================
+
 
 class TestSessionManagerEdgeCases:
     def test_custom_pomodoro_intervals(self):
@@ -231,6 +234,7 @@ class TestSessionManagerEdgeCases:
 # Pydantic model validator edge cases
 # ==========================================================================
 
+
 class TestPydanticModelValidators:
     def test_document_update_invalid_tags(self):
         """DocumentUpdate with tags containing invalid characters should fail."""
@@ -271,6 +275,7 @@ class TestPydanticModelValidators:
     def test_document_create_invalid_tags(self):
         """DocumentCreate with uppercase tags should fail validation."""
         from neural_lattice.api.models import DocumentCreate
+
         with pytest.raises(ValidationError, match="Invalid tag"):
             DocumentCreate(
                 doc_id="TST-TAG-001",
@@ -283,6 +288,7 @@ class TestPydanticModelValidators:
 # ==========================================================================
 # ZoneEngine version edge cases
 # ==========================================================================
+
 
 class TestZoneEngineVersionEdgeCases:
     def test_version_below_one_fails_yellow_to_red(self, zone_engine: ZoneEngine):

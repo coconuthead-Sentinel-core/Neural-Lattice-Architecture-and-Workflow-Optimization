@@ -15,7 +15,6 @@ from typing import Any, Generator
 
 from neural_lattice.meta.schemas import (
     ZoneEnum,
-    StatusEnum,
     validate_metadata,
 )
 
@@ -41,6 +40,24 @@ CREATE TABLE IF NOT EXISTS documents (
 _CREATE_INDEX_ZONE = "CREATE INDEX IF NOT EXISTS idx_documents_zone ON documents(zone);"
 _CREATE_INDEX_STATUS = "CREATE INDEX IF NOT EXISTS idx_documents_status ON documents(status);"
 _CREATE_INDEX_TAGS = "CREATE INDEX IF NOT EXISTS idx_documents_tags ON documents(tags);"
+
+# Columns that may be updated via the update() method — used to reject
+# unexpected keys before they reach SQL construction.
+_UPDATABLE_COLUMNS: frozenset[str] = frozenset(
+    {
+        "title",
+        "zone",
+        "protocol",
+        "artifact_type",
+        "cognitive_load",
+        "timestamp",
+        "dependencies",
+        "tags",
+        "status",
+        "content",
+        "version",
+    }
+)
 
 
 class DocumentStore:
@@ -128,9 +145,7 @@ class DocumentStore:
     def get(self, doc_id: str) -> dict[str, Any] | None:
         """Retrieve a document by ID."""
         with self._conn() as conn:
-            row = conn.execute(
-                "SELECT * FROM documents WHERE doc_id = ?", (doc_id,)
-            ).fetchone()
+            row = conn.execute("SELECT * FROM documents WHERE doc_id = ?", (doc_id,)).fetchone()
         if row is None:
             return None
         return self._row_to_dict(row)
@@ -141,11 +156,7 @@ class DocumentStore:
         if existing is None:
             raise KeyError(f"Document not found: {doc_id}")
 
-        allowed = {
-            "title", "zone", "protocol", "artifact_type", "cognitive_load",
-            "timestamp", "dependencies", "tags", "status", "content", "version",
-        }
-        cols_to_update = {k: v for k, v in updates.items() if k in allowed}
+        cols_to_update = {k: v for k, v in updates.items() if k in _UPDATABLE_COLUMNS}
         if not cols_to_update:
             return existing
 
@@ -160,17 +171,13 @@ class DocumentStore:
         values = list(cols_to_update.values()) + [doc_id]
 
         with self._conn() as conn:
-            conn.execute(
-                f"UPDATE documents SET {set_clause} WHERE doc_id = ?", values
-            )
+            conn.execute(f"UPDATE documents SET {set_clause} WHERE doc_id = ?", values)
         return self.get(doc_id)  # type: ignore[return-value]
 
     def delete(self, doc_id: str) -> bool:
         """Delete a document by ID. Returns True if deleted."""
         with self._conn() as conn:
-            cursor = conn.execute(
-                "DELETE FROM documents WHERE doc_id = ?", (doc_id,)
-            )
+            cursor = conn.execute("DELETE FROM documents WHERE doc_id = ?", (doc_id,))
         return cursor.rowcount > 0
 
     # ------------------------------------------------------------------
@@ -179,9 +186,7 @@ class DocumentStore:
 
     def list_all(self) -> list[dict[str, Any]]:
         with self._conn() as conn:
-            rows = conn.execute(
-                "SELECT * FROM documents ORDER BY updated_at DESC"
-            ).fetchall()
+            rows = conn.execute("SELECT * FROM documents ORDER BY updated_at DESC").fetchall()
         return [self._row_to_dict(r) for r in rows]
 
     def search(

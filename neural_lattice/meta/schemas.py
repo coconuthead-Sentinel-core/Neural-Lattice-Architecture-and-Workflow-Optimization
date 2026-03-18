@@ -71,20 +71,34 @@ def validate_metadata(meta: dict[str, Any]) -> list[str]:
     """Return a list of validation errors (empty = valid)."""
     errors: list[str] = []
     required = [
-        "doc_id", "title", "zone", "protocol", "artifact_type",
-        "cognitive_load", "timestamp", "dependencies", "tags", "status",
+        "doc_id",
+        "title",
+        "zone",
+        "protocol",
+        "artifact_type",
+        "cognitive_load",
+        "timestamp",
+        "dependencies",
+        "tags",
+        "status",
     ]
     for field in required:
         if field not in meta:
             errors.append(f"Missing required field: {field}")
 
     if "doc_id" in meta and not validate_doc_id(meta["doc_id"]):
-        errors.append(f"Invalid doc_id format: {meta['doc_id']} (expected ^[A-Z]{{3,4}}-[A-Z]{{3,6}}-[0-9]{{3}}$)")
+        errors.append(
+            f"Invalid doc_id format: {meta['doc_id']}"
+            " (expected ^[A-Z]{3,4}-[A-Z]{3,6}-[0-9]{3}$)"
+        )
 
     if "title" in meta:
         title = meta["title"]
         if not isinstance(title, str) or not (1 <= len(title) <= 200):
-            errors.append(f"Title must be 1-200 characters, got {len(title) if isinstance(title, str) else type(title)}")
+            errors.append(
+                "Title must be 1-200 characters, got "
+                f"{len(title) if isinstance(title, str) else type(title)}"
+            )
 
     if "zone" in meta:
         try:

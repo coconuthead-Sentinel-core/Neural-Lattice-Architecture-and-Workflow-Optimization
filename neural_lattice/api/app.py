@@ -2,27 +2,26 @@
 
 from __future__ import annotations
 
-import sys
-from typing import Any
+import sqlite3
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from neural_lattice.api.models import (
+    ClassifyRequest,
+    CognitiveLoadRequest,
     DocumentCreate,
     DocumentUpdate,
-    ZoneMigrateRequest,
-    ClassifyRequest,
-    ValidateRequest,
     SessionCreateRequest,
+    ValidateRequest,
     WorkEndRequest,
-    CognitiveLoadRequest,
+    ZoneMigrateRequest,
 )
 from neural_lattice.document_store import DocumentStore
-from neural_lattice.metadata_engine import MetadataEngine
-from neural_lattice.zone_engine import ZoneEngine, TransitionError
-from neural_lattice.session_manager import SessionManager
 from neural_lattice.meta.schemas import ZoneEnum, validate_metadata
+from neural_lattice.metadata_engine import MetadataEngine
+from neural_lattice.session_manager import SessionManager
+from neural_lattice.zone_engine import TransitionError, ZoneEngine
 
 app = FastAPI(
     title="Neural Lattice Cognitive Architecture",
@@ -55,6 +54,7 @@ state = _State()
 # Health
 # ==========================================================================
 
+
 @app.get("/api/health")
 def health_check():
     """Return service health status and API version."""
@@ -64,6 +64,7 @@ def health_check():
 # ==========================================================================
 # Documents CRUD
 # ==========================================================================
+
 
 @app.post("/api/documents", status_code=201)
 def create_document(body: DocumentCreate):
@@ -83,10 +84,8 @@ def create_document(body: DocumentCreate):
         doc = state.store.create(meta, content=body.content)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
-    except Exception as e:
-        if "UNIQUE constraint" in str(e):
-            raise HTTPException(status_code=409, detail=f"Document {body.doc_id} already exists")
-        raise
+    except sqlite3.IntegrityError:
+        raise HTTPException(status_code=409, detail=f"Document {body.doc_id} already exists")
     return doc
 
 
@@ -129,6 +128,7 @@ def delete_document(doc_id: str):
 # Search
 # ==========================================================================
 
+
 @app.get("/api/search")
 def search_documents(
     zone: str | None = Query(None),
@@ -144,6 +144,7 @@ def search_documents(
 # ==========================================================================
 # Zone operations
 # ==========================================================================
+
 
 @app.post("/api/classify")
 def classify_zone(body: ClassifyRequest):
@@ -179,11 +180,14 @@ def migrate_document(body: ZoneMigrateRequest):
         raise HTTPException(status_code=422, detail=str(e))
 
     new_status = state.zone_engine.get_new_status(from_zone, to_zone)
-    state.store.update(body.doc_id, {
-        "zone": to_zone.value,
-        "status": new_status.value,
-        "cognitive_load": body.cognitive_load,
-    })
+    state.store.update(
+        body.doc_id,
+        {
+            "zone": to_zone.value,
+            "status": new_status.value,
+            "cognitive_load": body.cognitive_load,
+        },
+    )
 
     return {
         "success": True,
@@ -205,6 +209,7 @@ def zone_summary():
 # Validation
 # ==========================================================================
 
+
 @app.post("/api/validate")
 def validate_document(body: ValidateRequest):
     """Validate document metadata against schema rules. Returns validity status and errors."""
@@ -216,6 +221,7 @@ def validate_document(body: ValidateRequest):
 # ==========================================================================
 # Session management
 # ==========================================================================
+
 
 @app.post("/api/sessions", status_code=201)
 def create_session(body: SessionCreateRequest | None = None):

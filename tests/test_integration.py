@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 from fastapi.testclient import TestClient
 
 
@@ -11,13 +10,16 @@ class TestDocumentLifecycle:
 
     def test_create_classify_migrate_archive(self, client: TestClient):
         # 1. Create a document in GREEN zone (cognitive_load=8)
-        r = client.post("/api/documents", json={
-            "doc_id": "INT-LIFE-001",
-            "title": "Lifecycle Test",
-            "cognitive_load": 8,
-            "status": "ACTIVE",
-            "tags": ["lifecycle"],
-        })
+        r = client.post(
+            "/api/documents",
+            json={
+                "doc_id": "INT-LIFE-001",
+                "title": "Lifecycle Test",
+                "cognitive_load": 8,
+                "status": "ACTIVE",
+                "tags": ["lifecycle"],
+            },
+        )
         assert r.status_code == 201
         doc = r.json()
         assert doc["zone"] == "GREEN"
@@ -27,12 +29,15 @@ class TestDocumentLifecycle:
         assert r.json()["zone"] == "GREEN"
 
         # 3. Migrate GREEN -> YELLOW (needs status!=DRAFT and cognitive_load<7)
-        r = client.post("/api/migrate", json={
-            "doc_id": "INT-LIFE-001",
-            "target_zone": "YELLOW",
-            "cognitive_load": 5,
-            "status": "ACTIVE",
-        })
+        r = client.post(
+            "/api/migrate",
+            json={
+                "doc_id": "INT-LIFE-001",
+                "target_zone": "YELLOW",
+                "cognitive_load": 5,
+                "status": "ACTIVE",
+            },
+        )
         assert r.status_code == 200
         assert r.json()["success"] is True
         assert r.json()["to_zone"] == "YELLOW"
@@ -45,12 +50,15 @@ class TestDocumentLifecycle:
         # 5. Migrate YELLOW -> RED (needs cognitive_load<4 and version>=1.0)
         # First update version to 1.0
         client.put("/api/documents/INT-LIFE-001", json={"version": "1.0"})
-        r = client.post("/api/migrate", json={
-            "doc_id": "INT-LIFE-001",
-            "target_zone": "RED",
-            "cognitive_load": 2,
-            "version": "1.0",
-        })
+        r = client.post(
+            "/api/migrate",
+            json={
+                "doc_id": "INT-LIFE-001",
+                "target_zone": "RED",
+                "cognitive_load": 2,
+                "version": "1.0",
+            },
+        )
         assert r.status_code == 200
         assert r.json()["to_zone"] == "RED"
 
@@ -66,14 +74,38 @@ class TestMultiFilterSearch:
     def _seed_documents(self, client: TestClient):
         """Create several documents across zones and types."""
         docs = [
-            {"doc_id": "INT-SRCH-001", "title": "Green Note", "cognitive_load": 8,
-             "artifact_type": "note", "tags": ["alpha"], "status": "ACTIVE"},
-            {"doc_id": "INT-SRCH-002", "title": "Green Code", "cognitive_load": 9,
-             "artifact_type": "code", "tags": ["alpha", "beta"], "status": "ACTIVE"},
-            {"doc_id": "INT-SRCH-003", "title": "Yellow Spec", "cognitive_load": 5,
-             "artifact_type": "spec", "tags": ["beta"], "status": "DRAFT"},
-            {"doc_id": "INT-SRCH-004", "title": "Red Report", "cognitive_load": 2,
-             "artifact_type": "report", "tags": ["gamma"], "status": "DRAFT"},
+            {
+                "doc_id": "INT-SRCH-001",
+                "title": "Green Note",
+                "cognitive_load": 8,
+                "artifact_type": "note",
+                "tags": ["alpha"],
+                "status": "ACTIVE",
+            },
+            {
+                "doc_id": "INT-SRCH-002",
+                "title": "Green Code",
+                "cognitive_load": 9,
+                "artifact_type": "code",
+                "tags": ["alpha", "beta"],
+                "status": "ACTIVE",
+            },
+            {
+                "doc_id": "INT-SRCH-003",
+                "title": "Yellow Spec",
+                "cognitive_load": 5,
+                "artifact_type": "spec",
+                "tags": ["beta"],
+                "status": "DRAFT",
+            },
+            {
+                "doc_id": "INT-SRCH-004",
+                "title": "Red Report",
+                "cognitive_load": 2,
+                "artifact_type": "report",
+                "tags": ["gamma"],
+                "status": "DRAFT",
+            },
         ]
         for d in docs:
             r = client.post("/api/documents", json=d)
@@ -120,19 +152,25 @@ class TestSessionDocumentInteraction:
         assert r.json()["phase"] == "WORK"
 
         # 3. Create a document during the work block
-        r = client.post("/api/documents", json={
-            "doc_id": "INT-SESS-001",
-            "title": "Document Created During Session",
-            "cognitive_load": 7,
-            "tags": ["session_work"],
-        })
+        r = client.post(
+            "/api/documents",
+            json={
+                "doc_id": "INT-SESS-001",
+                "title": "Document Created During Session",
+                "cognitive_load": 7,
+                "tags": ["session_work"],
+            },
+        )
         assert r.status_code == 201
 
         # 4. End work with cognitive load
-        r = client.post("/api/sessions/int-sess-001/end-work", json={
-            "cognitive_load": 7,
-            "notes": "Created INT-SESS-001",
-        })
+        r = client.post(
+            "/api/sessions/int-sess-001/end-work",
+            json={
+                "cognitive_load": 7,
+                "notes": "Created INT-SESS-001",
+            },
+        )
         assert r.json()["phase"] == "BREAK"
         assert r.json()["pomodoro_count"] == 1
         assert 7 in r.json()["cognitive_loads"]
@@ -192,29 +230,38 @@ class TestUpdateThenMigrate:
 
     def test_update_then_migrate(self, client: TestClient):
         # Create document
-        client.post("/api/documents", json={
-            "doc_id": "INT-UMIG-001",
-            "title": "Update Then Migrate",
-            "cognitive_load": 8,
-            "status": "ACTIVE",
-        })
+        client.post(
+            "/api/documents",
+            json={
+                "doc_id": "INT-UMIG-001",
+                "title": "Update Then Migrate",
+                "cognitive_load": 8,
+                "status": "ACTIVE",
+            },
+        )
 
         # Update the title and content
-        r = client.put("/api/documents/INT-UMIG-001", json={
-            "title": "Updated Title",
-            "content": "New content after update",
-        })
+        r = client.put(
+            "/api/documents/INT-UMIG-001",
+            json={
+                "title": "Updated Title",
+                "content": "New content after update",
+            },
+        )
         assert r.status_code == 200
         assert r.json()["title"] == "Updated Title"
         assert r.json()["content"] == "New content after update"
 
         # Migrate GREEN -> YELLOW
-        r = client.post("/api/migrate", json={
-            "doc_id": "INT-UMIG-001",
-            "target_zone": "YELLOW",
-            "cognitive_load": 5,
-            "status": "ACTIVE",
-        })
+        r = client.post(
+            "/api/migrate",
+            json={
+                "doc_id": "INT-UMIG-001",
+                "target_zone": "YELLOW",
+                "cognitive_load": 5,
+                "status": "ACTIVE",
+            },
+        )
         assert r.status_code == 200
         assert r.json()["to_zone"] == "YELLOW"
 

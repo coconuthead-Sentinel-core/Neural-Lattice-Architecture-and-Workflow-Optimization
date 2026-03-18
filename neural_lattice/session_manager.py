@@ -56,10 +56,7 @@ class Session:
 
     @property
     def is_long_break_due(self) -> bool:
-        return (
-            self.pomodoro_count > 0
-            and self.pomodoro_count % self.long_break_interval == 0
-        )
+        return self.pomodoro_count > 0 and self.pomodoro_count % self.long_break_interval == 0
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -131,7 +128,9 @@ class SessionManager:
         session.work_blocks.append(block)
         return session
 
-    def end_work(self, session_id: str, cognitive_load: int | None = None, notes: str = "") -> Session:
+    def end_work(
+        self, session_id: str, cognitive_load: int | None = None, notes: str = ""
+    ) -> Session:
         session = self._get(session_id)
         if session.phase != SessionPhase.WORK:
             raise ValueError(f"Cannot end work: session is in {session.phase.value}")

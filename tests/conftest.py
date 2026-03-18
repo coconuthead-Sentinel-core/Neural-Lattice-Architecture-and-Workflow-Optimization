@@ -7,11 +7,11 @@ from datetime import datetime, timezone
 import pytest
 from fastapi.testclient import TestClient
 
-from neural_lattice.api.app import app, state, _State
+from neural_lattice.api.app import app, state
 from neural_lattice.document_store import DocumentStore
 from neural_lattice.metadata_engine import MetadataEngine
-from neural_lattice.zone_engine import ZoneEngine
 from neural_lattice.session_manager import SessionManager
+from neural_lattice.zone_engine import ZoneEngine
 
 
 @pytest.fixture
