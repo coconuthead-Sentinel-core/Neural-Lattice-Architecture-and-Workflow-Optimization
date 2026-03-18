@@ -142,7 +142,9 @@ class DocumentStore:
             )
         created = self.get(meta["doc_id"])
         if created is None:
-            raise RuntimeError("Failed to fetch document immediately after creation.")
+            raise RuntimeError(
+                f"Failed to fetch document immediately after creation: {meta['doc_id']}"
+            )
         return created
 
     def get(self, doc_id: str) -> dict[str, Any] | None:
@@ -177,7 +179,7 @@ class DocumentStore:
             conn.execute(f"UPDATE documents SET {set_clause} WHERE doc_id = ?", values)
         updated = self.get(doc_id)
         if updated is None:
-            raise RuntimeError(f"Document disappeared after update: {doc_id}")
+            raise RuntimeError(f"Failed to fetch document immediately after update: {doc_id}")
         return updated
 
     def delete(self, doc_id: str) -> bool:
