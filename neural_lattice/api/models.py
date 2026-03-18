@@ -38,6 +38,16 @@ class DocumentUpdate(BaseModel):
     content: str | None = None
     version: str | None = None
 
+    @field_validator("tags", mode="before")
+    @classmethod
+    def validate_tags(cls, v: list[str] | None) -> list[str] | None:
+        if v is None:
+            return v
+        for tag in v:
+            if not re.match(r"^[a-z][a-z0-9_]*$", tag):
+                raise ValueError(f"Invalid tag: {tag}")
+        return v
+
 
 class ZoneMigrateRequest(BaseModel):
     doc_id: str
@@ -61,8 +71,8 @@ class ValidateRequest(BaseModel):
     artifact_type: str
     cognitive_load: int
     timestamp: str
-    dependencies: list[str]
-    tags: list[str]
+    dependencies: list[str] = Field(default_factory=list)
+    tags: list[str] = Field(default_factory=list)
     status: str
 
 

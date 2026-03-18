@@ -57,6 +57,7 @@ state = _State()
 
 @app.get("/api/health")
 def health_check():
+    """Return service health status and API version."""
     return {"status": "healthy", "version": "0.1.0"}
 
 
@@ -66,6 +67,7 @@ def health_check():
 
 @app.post("/api/documents", status_code=201)
 def create_document(body: DocumentCreate):
+    """Create a new document with generated metadata. Returns 409 if doc_id already exists."""
     meta = state.metadata_engine.generate(
         doc_id=body.doc_id,
         title=body.title,
@@ -90,11 +92,13 @@ def create_document(body: DocumentCreate):
 
 @app.get("/api/documents")
 def list_documents():
+    """Return all documents in the store."""
     return state.store.list_all()
 
 
 @app.get("/api/documents/{doc_id}")
 def get_document(doc_id: str):
+    """Retrieve a single document by its ID. Returns 404 if not found."""
     doc = state.store.get(doc_id)
     if doc is None:
         raise HTTPException(status_code=404, detail=f"Document not found: {doc_id}")
@@ -103,6 +107,7 @@ def get_document(doc_id: str):
 
 @app.put("/api/documents/{doc_id}")
 def update_document(doc_id: str, body: DocumentUpdate):
+    """Update fields on an existing document. Only non-null fields are applied."""
     updates = body.model_dump(exclude_none=True)
     try:
         doc = state.store.update(doc_id, updates)
@@ -113,6 +118,7 @@ def update_document(doc_id: str, body: DocumentUpdate):
 
 @app.delete("/api/documents/{doc_id}")
 def delete_document(doc_id: str):
+    """Delete a document by ID. Returns 404 if not found."""
     deleted = state.store.delete(doc_id)
     if not deleted:
         raise HTTPException(status_code=404, detail=f"Document not found: {doc_id}")
@@ -131,6 +137,7 @@ def search_documents(
     artifact_type: str | None = Query(None),
     q: str | None = Query(None),
 ):
+    """Search documents by zone, status, tag, artifact_type, or free-text query."""
     return state.store.search(zone=zone, status=status, tag=tag, artifact_type=artifact_type, q=q)
 
 
@@ -140,12 +147,14 @@ def search_documents(
 
 @app.post("/api/classify")
 def classify_zone(body: ClassifyRequest):
+    """Classify a cognitive load value (1-10) into a zone (GREEN/YELLOW/RED)."""
     zone = state.zone_engine.classify_zone(body.cognitive_load)
     return {"cognitive_load": body.cognitive_load, "zone": zone.value}
 
 
 @app.post("/api/migrate")
 def migrate_document(body: ZoneMigrateRequest):
+    """Migrate a document to a new zone, enforcing transition rules and updating status."""
     doc = state.store.get(body.doc_id)
     if doc is None:
         raise HTTPException(status_code=404, detail=f"Document not found: {body.doc_id}")
@@ -188,6 +197,7 @@ def migrate_document(body: ZoneMigrateRequest):
 
 @app.get("/api/zones/summary")
 def zone_summary():
+    """Return document counts grouped by zone."""
     return state.store.count_by_zone()
 
 
@@ -197,6 +207,7 @@ def zone_summary():
 
 @app.post("/api/validate")
 def validate_document(body: ValidateRequest):
+    """Validate document metadata against schema rules. Returns validity status and errors."""
     meta = body.model_dump()
     errors = validate_metadata(meta)
     return {"valid": len(errors) == 0, "errors": errors}
@@ -208,6 +219,7 @@ def validate_document(body: ValidateRequest):
 
 @app.post("/api/sessions", status_code=201)
 def create_session(body: SessionCreateRequest | None = None):
+    """Create a new work session, optionally with a specified session ID."""
     sid = body.session_id if body else None
     session = state.session_mgr.init_session(session_id=sid)
     return session.to_dict()
@@ -215,11 +227,13 @@ def create_session(body: SessionCreateRequest | None = None):
 
 @app.get("/api/sessions")
 def list_sessions():
+    """Return all active and closed sessions."""
     return [s.to_dict() for s in state.session_mgr.list_sessions()]
 
 
 @app.get("/api/sessions/{session_id}")
 def get_session(session_id: str):
+    """Retrieve a session by ID. Returns 404 if not found."""
     try:
         session = state.session_mgr.get_session(session_id)
     except KeyError:
@@ -229,6 +243,7 @@ def get_session(session_id: str):
 
 @app.post("/api/sessions/{session_id}/work")
 def start_work(session_id: str):
+    """Begin a work interval for the given session. Returns 422 if already working."""
     try:
         session = state.session_mgr.start_work(session_id)
     except KeyError:
@@ -240,6 +255,7 @@ def start_work(session_id: str):
 
 @app.post("/api/sessions/{session_id}/end-work")
 def end_work(session_id: str, body: WorkEndRequest | None = None):
+    """End the current work interval, optionally recording cognitive load and notes."""
     try:
         session = state.session_mgr.end_work(
             session_id,
@@ -255,6 +271,7 @@ def end_work(session_id: str, body: WorkEndRequest | None = None):
 
 @app.post("/api/sessions/{session_id}/load")
 def record_cognitive_load(session_id: str, body: CognitiveLoadRequest):
+    """Record a cognitive load measurement (1-10) for the session."""
     try:
         session = state.session_mgr.record_load(session_id, body.cognitive_load)
     except KeyError:
@@ -266,6 +283,7 @@ def record_cognitive_load(session_id: str, body: CognitiveLoadRequest):
 
 @app.post("/api/sessions/{session_id}/wrap-up")
 def wrap_up_session(session_id: str):
+    """Transition the session into wrap-up state for final review."""
     try:
         session = state.session_mgr.wrap_up(session_id)
     except KeyError:
@@ -277,6 +295,7 @@ def wrap_up_session(session_id: str):
 
 @app.post("/api/sessions/{session_id}/close")
 def close_session(session_id: str):
+    """Permanently close a session. Returns 404 if not found."""
     try:
         session = state.session_mgr.close(session_id)
     except KeyError:
