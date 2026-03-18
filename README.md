@@ -1,16 +1,16 @@
-# Neural-Lattice-Architecture-and-Workflow-Optimization
-A structured workflow framework that explains the Neural Lattice Architecture and its role in optimizing AI‑supported project management.
 # Neural Lattice Architecture: Strategic Insights on Workflow Optimization
+
+> A structured, neurodiversity‑aligned workflow framework that explains the Neural Lattice Architecture and its role in optimizing AI‑supported project management.
 
 This repository documents a conceptual framework and research article on workflow optimization. It is not a product, service, or clinical model.
 
-This repository contains the full technical article on the Neural Lattice Architecture (NLA) and its application to workflow optimization, particularly for professionals with diverse working styles. It expands [...]
+This repository contains the full technical article on the Neural Lattice Architecture (NLA) and its application to workflow optimization, particularly for professionals with diverse working styles. It expands on the concepts introduced in the LinkedIn article and provides a comprehensive guide to implementing the NLA in practice.
 
 ---
 
 ## Overview
 
-The Neural Lattice Architecture is a cognitive workflow framework designed to improve AI–human collaboration by embedding project intelligence directly into a structured folder system. This redu[...]
+The Neural Lattice Architecture is a cognitive workflow framework designed to improve AI–human collaboration by embedding project intelligence directly into a structured folder system. This reduces cognitive load, increases throughput, and enables more consistent decision-making across complex, multi-phase projects.
 
 The system organizes work into three cognitive zones:
 
@@ -75,7 +75,6 @@ A concise version of this article is available on LinkedIn:
 **LinkedIn Link:** *(Add link after publishing)*
 
 ---
----
 
 ## License
 
@@ -86,3 +85,18 @@ Full license text: https://creativecommons.org/licenses/by/4.0/
 
 
 ## Repository Structure (Recommended)
+
+```
+Neural-Lattice-Architecture-and-Workflow-Optimization/
+├── README.md                   # This document – framework overview and article
+├── LICENSE                     # CC BY 4.0 International License
+├── GREEN/                      # Active work with highest cognitive load
+│   ├── current-projects/
+│   └── in-progress-tasks/
+├── YELLOW/                     # Synthesis, pattern recognition, review
+│   ├── templates/
+│   └── drafts/
+└── RED/                        # Reference materials and completed work
+    ├── archived-projects/
+    └── reference-docs/
+```
