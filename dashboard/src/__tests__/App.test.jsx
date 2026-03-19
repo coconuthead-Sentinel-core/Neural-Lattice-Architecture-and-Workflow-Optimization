@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import App from '../App';
 
 // Mock all child components to isolate App tests
@@ -47,21 +47,25 @@ describe('App', () => {
     expect(overviewBtn).toHaveClass('active');
   });
 
-  it('switches active tab when clicking a different tab', () => {
+  it('switches active tab when clicking a different tab', async () => {
     render(<App />);
 
     const matrixBtn = screen.getByText('Eisenhower Matrix');
-    fireEvent.click(matrixBtn);
+    await act(async () => {
+      fireEvent.click(matrixBtn);
+    });
 
     expect(matrixBtn).toHaveClass('active');
     expect(screen.getByText('Zone Overview')).not.toHaveClass('active');
     expect(screen.getByTestId('eisenhower-matrix')).toBeInTheDocument();
   });
 
-  it('shows Session panel when Session tab is clicked', () => {
+  it('shows Session panel when Session tab is clicked', async () => {
     render(<App />);
 
-    fireEvent.click(screen.getByText('Session'));
+    await act(async () => {
+      fireEvent.click(screen.getByText('Session'));
+    });
     expect(screen.getByTestId('session-panel')).toBeInTheDocument();
   });
 });

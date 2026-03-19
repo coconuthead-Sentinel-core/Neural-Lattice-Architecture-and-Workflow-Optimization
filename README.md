@@ -36,6 +36,17 @@ uvicorn neural_lattice.api.app:app --reload
 # API docs available at http://127.0.0.1:8000/docs
 ```
 
+## Dashboard (frontend)
+
+```bash
+cd dashboard
+cp .env.example .env   # optional: override API base URL
+npm install
+npm run dev            # http://localhost:5173
+```
+
+The dashboard defaults to `http://127.0.0.1:8000` for API calls. Override by setting `VITE_API_BASE` in `dashboard/.env`.
+
 ## Configuration
 
 Copy `.env.example` to `.env` and adjust settings:
