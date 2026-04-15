@@ -136,28 +136,86 @@
 
 ---
 
-## 5. Closed-Loop Pomodoro Cycle Methodology
+## 5. Structured Reflection — The Ouroboros Model
+
+> *Reference image: A spiral mind (recursive cognitive processing) connected
+> bidirectionally to an ouroboros (self-consuming snake) — the closed loop.*
+
+The Structured Reflection pattern is embedded directly into the session manager's
+Pomodoro lifecycle. After each WORK block completes, the session enters a REFLECT
+phase before transitioning to BREAK. This creates the ouroboros: each cycle's
+output feeds forward as the next cycle's input.
+
+```
+         ┌──────────────────────────────────────────────────────┐
+         │            STRUCTURED REFLECTION (Ouroboros)          │
+         │                                                       │
+         │     ╭─────────╮                    ╭──────────╮      │
+         │     │  SPIRAL  │ ── carry_forward → │ OUROBOROS│      │
+         │     │  (Mind)  │ ←── insight ────── │  (Loop)  │      │
+         │     ╰─────────╯                    ╰──────────╯      │
+         │          │                               │            │
+         │     ┌────┴────┐  ┌─────────┐  ┌────────┴───┐       │
+         │     │  WORK   │→ │ REFLECT │→ │   BREAK    │       │
+         │     │ (focus) │  │(insight)│  │ (recover)  │       │
+         │     └─────────┘  └─────────┘  └────────────┘       │
+         │          ▲                           │               │
+         │          └───────────────────────────┘               │
+         │              carry_forward feeds                     │
+         │              next work block                         │
+         └──────────────────────────────────────────────────────┘
+```
+
+### Implementation
+
+| Component | Location | What it does |
+|-----------|----------|-------------|
+| `SessionPhase.REFLECT` | `session_manager.py` | New phase between WORK and BREAK |
+| `ReflectionEntry` | `session_manager.py` | Dataclass: insight, cognitive loads, carry_forward |
+| `SessionManager.reflect()` | `session_manager.py` | Records reflection, transitions to BREAK |
+| `Session.latest_carry_forward` | `session_manager.py` | Property: most recent carry_forward (ouroboros output) |
+| `POST /api/sessions/{id}/reflect` | `api/app.py` | REST endpoint for structured reflection |
+| `ReflectRequest` | `api/models.py` | Pydantic model: insight, cognitive_load_after, carry_forward |
+
+### How the Ouroboros Self-Reinforces
+
+1. **WORK** — Focused execution within the Pomodoro window
+2. **end_work()** — Transitions to REFLECT (captures cognitive_load)
+3. **REFLECT** — The spiral: process what happened, extract an insight
+4. **reflect()** — Records the insight + a carry_forward action item
+5. **BREAK** — Recovery; the carry_forward is available for the next cycle
+6. **start_work()** — The ouroboros completes: `session.latest_carry_forward`
+   provides continuity from the previous reflection into the new work block
+
+Each cycle's reflection reinforces the principal rule: the carry_forward
+from cycle N becomes the context for cycle N+1, creating a self-sustaining
+feedback loop that improves focus with each iteration.
+
+---
+
+## 6. Closed-Loop Pomodoro Cycle Methodology
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │              CLOSED-LOOP POMODORO SYSTEM             │
 │                                                      │
-│  ┌──────────┐    ┌──────────┐    ┌──────────┐       │
-│  │ CLASSIFY │───>│ EXECUTE  │───>│ VERIFY   │       │
-│  │(Eisenhow)│    │ (Merge)  │    │ (Test)   │       │
-│  └──────────┘    └──────────┘    └──────────┘       │
-│       ▲                               │              │
-│       │         ┌──────────┐          │              │
-│       └─────────│ FEEDBACK │<─────────┘              │
-│                 │ (Report) │                         │
-│                 └──────────┘                         │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐          │
+│  │ CLASSIFY │─>│ EXECUTE  │─>│ REFLECT  │          │
+│  │(Eisenhow)│  │ (Merge)  │  │(Insight) │          │
+│  └──────────┘  └──────────┘  └──────────┘          │
+│       ▲                            │                 │
+│       │     ┌──────────┐    ┌──────────┐            │
+│       │     │ FEEDBACK │<───│ VERIFY   │            │
+│       └─────│ (Report) │    │ (Test)   │            │
+│             └──────────┘    └──────────┘            │
 │                                                      │
 │  Each cycle:                                         │
 │  1. Classify → Eisenhower matrix (Q1/Q2/Q3/Q4)     │
 │  2. Execute  → Merge in priority order              │
-│  3. Verify   → Run tests + lint after each merge    │
-│  4. Feedback → Push results, update report          │
-│  5. Repeat   → Next priority quadrant               │
+│  3. Reflect  → Structured reflection (ouroboros)    │
+│  4. Verify   → Run tests + lint after each merge    │
+│  5. Feedback → Push results, update report          │
+│  6. Repeat   → carry_forward feeds next quadrant    │
 │                                                      │
 │  Principal reinforcement:                            │
 │  - Each successful verify step reinforces the        │
@@ -189,9 +247,10 @@
 | Branches skipped (stale/empty) | 8 |
 | Branches already in main | 2 |
 | Tests before audit | 144 passed |
-| Tests after audit | 161 passed (+17 new) |
+| Tests after audit | 169 passed (+25 new) |
 | Lint status | All checks passed |
 | Conflicts resolved | 5 files (kept superior versions) |
 | New files added | 3 (`quantum_nexus_forge.py`, `test_quantum_nexus_forge.py`, `SDLC_Stage1_Planning.md`) |
 | Docs upgraded | 10 SDLC documents |
-| Net code quality | +RuntimeError guards, +env config, +act() test wrappers |
+| Structured Reflection | REFLECT phase + ouroboros carry_forward loop added |
+| Net code quality | +RuntimeError guards, +env config, +act() test wrappers, +reflection API |

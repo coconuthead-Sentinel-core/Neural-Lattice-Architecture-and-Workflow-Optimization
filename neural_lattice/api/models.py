@@ -88,3 +88,9 @@ class WorkEndRequest(BaseModel):
 
 class CognitiveLoadRequest(BaseModel):
     cognitive_load: int = Field(..., ge=1, le=10)
+
+
+class ReflectRequest(BaseModel):
+    insight: str = Field(..., min_length=1, max_length=1000)
+    cognitive_load_after: int | None = Field(None, ge=1, le=10)
+    carry_forward: str = ""

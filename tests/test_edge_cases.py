@@ -209,14 +209,18 @@ class TestSessionManagerEdgeCases:
         mgr = SessionManager(long_break_interval=2)
         session = mgr.init_session("lb-test")
 
-        # First pomodoro -> BREAK
+        # First pomodoro -> REFLECT -> BREAK
         mgr.start_work("lb-test")
         session = mgr.end_work("lb-test", cognitive_load=5)
+        assert session.phase.value == "REFLECT"
+        session = mgr.reflect("lb-test", insight="First cycle done")
         assert session.phase.value == "BREAK"
 
-        # Second pomodoro -> LONG_BREAK
+        # Second pomodoro -> REFLECT -> LONG_BREAK
         mgr.start_work("lb-test")
         session = mgr.end_work("lb-test", cognitive_load=5)
+        assert session.phase.value == "REFLECT"
+        session = mgr.reflect("lb-test", insight="Second cycle done")
         assert session.phase.value == "LONG_BREAK"
 
     def test_cannot_start_work_from_work(self, session_mgr: SessionManager):

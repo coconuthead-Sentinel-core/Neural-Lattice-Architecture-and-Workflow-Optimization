@@ -294,7 +294,7 @@ class TestSessions:
         assert r.json()["phase"] == "WORK"
 
         r = client.post("/api/sessions/s1/end-work", json={"cognitive_load": 7})
-        assert r.json()["phase"] == "BREAK"
+        assert r.json()["phase"] == "REFLECT"
         assert r.json()["pomodoro_count"] == 1
 
         r = client.post("/api/sessions/s1/wrap-up")

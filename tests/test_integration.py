@@ -163,7 +163,7 @@ class TestSessionDocumentInteraction:
         )
         assert r.status_code == 201
 
-        # 4. End work with cognitive load
+        # 4. End work with cognitive load — enters REFLECT phase
         r = client.post(
             "/api/sessions/int-sess-001/end-work",
             json={
@@ -171,7 +171,7 @@ class TestSessionDocumentInteraction:
                 "notes": "Created INT-SESS-001",
             },
         )
-        assert r.json()["phase"] == "BREAK"
+        assert r.json()["phase"] == "REFLECT"
         assert r.json()["pomodoro_count"] == 1
         assert 7 in r.json()["cognitive_loads"]
 

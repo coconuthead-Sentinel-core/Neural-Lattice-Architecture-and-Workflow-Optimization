@@ -12,6 +12,7 @@ from neural_lattice.api.models import (
     CognitiveLoadRequest,
     DocumentCreate,
     DocumentUpdate,
+    ReflectRequest,
     SessionCreateRequest,
     ValidateRequest,
     WorkEndRequest,
@@ -267,6 +268,27 @@ def end_work(session_id: str, body: WorkEndRequest | None = None):
             session_id,
             cognitive_load=body.cognitive_load if body else None,
             notes=body.notes if body else "",
+        )
+    except KeyError:
+        raise HTTPException(status_code=404, detail=f"Session not found: {session_id}")
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    return session.to_dict()
+
+
+@app.post("/api/sessions/{session_id}/reflect")
+def reflect(session_id: str, body: ReflectRequest):
+    """Record a structured reflection (ouroboros turn) after a work block.
+
+    Captures an insight and an optional carry_forward item that feeds into
+    the next Pomodoro cycle, completing the self-reinforcing closed loop.
+    """
+    try:
+        session = state.session_mgr.reflect(
+            session_id,
+            insight=body.insight,
+            cognitive_load_after=body.cognitive_load_after,
+            carry_forward=body.carry_forward,
         )
     except KeyError:
         raise HTTPException(status_code=404, detail=f"Session not found: {session_id}")
