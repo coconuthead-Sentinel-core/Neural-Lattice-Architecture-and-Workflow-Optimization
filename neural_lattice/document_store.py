@@ -140,7 +140,9 @@ class DocumentStore:
                     now,
                 ),
             )
-        return self.get(meta["doc_id"])
+        result = self.get(meta["doc_id"])
+        assert result is not None  # just inserted
+        return result
 
     def get(self, doc_id: str) -> dict[str, Any] | None:
         """Retrieve a document by ID."""
