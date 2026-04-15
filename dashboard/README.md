@@ -1,16 +1,32 @@
-# React + Vite
+# Neural Lattice Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite front-end for the Neural Lattice Cognitive Architecture (NLCA). The UI surfaces zone summaries, document triage, Eisenhower matrix views, and session controls backed by the FastAPI service.
 
-Currently, two official plugins are available:
+## Prerequisites
+- Node 20+
+- Running NLCA API (see repository root README for backend quick start)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Setup
+```bash
+cd dashboard
+cp .env.example .env   # optional: override API base URL
+npm install
+```
 
-## React Compiler
+### API configuration
+The dashboard targets `http://127.0.0.1:8000` by default. To point at another host/port, set `VITE_API_BASE` in `.env`:
+```
+VITE_API_BASE=http://localhost:8000
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Run the dashboard
+```bash
+npm run dev   # http://localhost:5173 with HMR
+```
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Test, lint, and build
+```bash
+npm run test   # vitest
+npm run lint   # eslint
+npm run build  # production build
+```
