@@ -1,10 +1,8 @@
 """Tests for the Quantum Nexus Forge engine."""
 
-import pytest
 from neural_lattice.quantum_nexus_forge import (
-    CognitivePrimitiveType,
     CognitiveNode,
-    LatticeEdge,
+    CognitivePrimitiveType,
     QuantumNexusForge,
 )
 
