@@ -1,4 +1,5 @@
-# Neural Lattice Cognitive Architecture (NLCA)
+#Neural-Lattice-Architecture-and-Workflow-Optimization
+ 
 
 A cognitive workflow framework providing persistent memory, zone-based organization (GREEN/YELLOW/RED), and neurodivergent-optimized workflows for AI-human collaboration.
 
